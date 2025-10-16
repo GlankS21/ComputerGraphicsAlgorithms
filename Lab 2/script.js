@@ -42,18 +42,23 @@ window.onload = async () => {
     canvas.width = bounds.width || canvas.width || 300;
     canvas.height = bounds.height || canvas.height || 150;
   }
+
+  // khởi tạo slider mặc định
+  brightSlider.value = 50; 
+  contrastSlider.value = 0; 
+  invertedSlider.value = 50;
+
   // Загружаем дефолтное изображение (если есть)
   await uploadImage("./cat.webp");
 
   // метки ползунка и значения гистограммы.
   updateSliderLabelAttrs();
-  drawAllHistValueLabels();
 };
 
 // Обработка изменений пользователем ползунков
 brightSlider.oninput = () => {
   updateSliderLabelAttrs();
-  calculate(orig, bright, histBright, brightSlider.value / 100, "brightness");
+  calculate(orig, bright, histBright, (brightSlider.value / 50 - 1), "brightness");
 };
 
 contrastSlider.oninput = () => {
@@ -97,7 +102,6 @@ async function calculate(origCanvas, canvas, histCanvas, value, type) {
   const h = origCanvas.height;
   if (w === 0 || h === 0) return;
 
-  // попиксельные данные
   let imageData = ctxOrig.getImageData(0, 0, w, h);
   let data = imageData.data;
 
@@ -109,13 +113,16 @@ async function calculate(origCanvas, canvas, histCanvas, value, type) {
       data[i + 1] = clamp(Math.round(factor * (data[i + 1] - 128) + 128));
       data[i + 2] = clamp(Math.round(factor * (data[i + 2] - 128) + 128));
     }
-  } else if (type === "brightness") {
+  } 
+  else if (type === "brightness") {
+    let factor = 1 + value; // value từ -0.5..+0.5
     for (let i = 0; i < data.length; i += 4) {
-      data[i] = clamp(Math.round(data[i] * value));
-      data[i + 1] = clamp(Math.round(data[i + 1] * value));
-      data[i + 2] = clamp(Math.round(data[i + 2] * value));
+      data[i] = clamp(Math.round(data[i] * factor));
+      data[i + 1] = clamp(Math.round(data[i + 1] * factor));
+      data[i + 2] = clamp(Math.round(data[i + 2] * factor));
     }
-  } else if (type === "inverted") {
+  } 
+  else if (type === "inverted") {
     for (let i = 0; i < data.length; i += 4) {
       data[i] = clamp(Math.round(255 - data[i] * value));
       data[i + 1] = clamp(Math.round(255 - data[i + 1] * value));
@@ -219,10 +226,11 @@ async function uploadImage(image) {
 
   imageGlobal.src = img.src;
   loadImage(img, orig, histOrig);
-  calculate(orig, bright, histBright, brightSlider.value / 100, "brightness");
+  calculate(orig, bright, histBright, (brightSlider.value / 50 - 1), "brightness");
   calculate(orig, cont, histCont, contrastSlider.value, "contrast");
   calculate(orig, inverted, histInverted, invertedSlider.value / 100, "inverted");
 }
+
 // tải và hiển thị ảnh lên canvas, đồng thời tính và vẽ histogram tương ứng
 function loadImage(img, canvas, histCanvas) {
   let ctx = canvas.getContext("2d");
@@ -266,12 +274,4 @@ function drawImageProp(ctx, img, x, y, w, h, offsetX, offsetY) {
   if (ch > ih) ch = ih;
 
   ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h);
-}
-
-// Вспомогательная функция — нарисовать все надписанные значения сразу
-function drawAllHistValueLabels() {
-  drawHistValueLabel(histOrig, `Original`);
-  drawHistValueLabel(histBright, `Brightness: ${safeInt(brightSlider.value)}%`);
-  drawHistValueLabel(histCont, `Contrast: ${safeInt(contrastSlider.value)}`);
-  drawHistValueLabel(histInverted, `Inverted: ${safeInt(invertedSlider.value)}%`);
 }
