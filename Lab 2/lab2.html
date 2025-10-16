@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="style.css" />
+    <title>Lab 2</title>
+  </head>
+  <body>
+    <header>
+      <h2>Brightness Contrast Inverted</h2>
+      <br>
+    </header>
+
+   <div class="content">
+    <!-- Block 1: Original -->
+    <div class="filter-block">
+        <p>Original</p>
+        <canvas class="img"></canvas>
+        <input accept="image" type="file" id="upload" oninput="uploadImage(this.files[0])" />
+        <canvas></canvas>
+    </div>
+
+    <!-- Block 2: Яркость -->
+    <div class="filter-block">
+        <p>Яркость</p>
+        <canvas class="img"></canvas>
+        <input type="range" min="0" max="100" id="brightness" />
+        <canvas></canvas>
+    </div>
+
+    <!-- Block 3: Контраст -->
+    <div class="filter-block">
+        <p>Контраст</p>
+        <canvas class="img"></canvas>
+        <input type="range" min="-100" max="100" id="contrast" />
+        <canvas></canvas>
+    </div>
+
+    <!-- Block 4: Инверсия -->
+    <div class="filter-block">
+        <p>Инверсия</p>
+        <canvas class="img"></canvas>
+        <input type="range" min="0" max="100" id="inverted" />
+        <canvas></canvas>
+    </div>
+    </div>
+  </body>
+</html>
